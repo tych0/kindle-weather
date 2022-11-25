@@ -71,7 +71,7 @@ result = json.loads(body)
 
 current = [
     [
-        get_ascii_art(result["current_condition"][0]["weatherDesc"][0]["value"]),
+        result["current_condition"][0]["weatherDesc"][0]["value"],
         f"""<span style="font-size: 40px">{result['current_condition'][0]['temp_F']} F</span>""",
     ]
 ]
