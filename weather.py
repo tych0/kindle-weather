@@ -69,46 +69,69 @@ if charset:
 
 result = json.loads(body)
 
-current = [[
-    get_ascii_art(result['current_condition'][0]['weatherDesc'][0]["value"]),
-    f"""<span style="font-size: 40px">{result['current_condition'][0]['temp_F']} F</span>""",
-]]
+current = [
+    [
+        get_ascii_art(result["current_condition"][0]["weatherDesc"][0]["value"]),
+        f"""<span style="font-size: 40px">{result['current_condition'][0]['temp_F']} F</span>""",
+    ]
+]
+
 
 def render_cell(hourly):
-    desc = hourly['weatherDesc'][0]["value"]
+    desc = hourly["weatherDesc"][0]["value"]
     temp = f"""<span style="font-size: 28px">{hourly['tempF']} F</span>"""
     windy = ""
     if int(hourly["windspeedMiles"]) > 10:
-            windy = "windy!"
+        windy = "windy!"
     return f"{desc}\n{temp}\n{windy}"
 
-today = result['weather'][0]
-tomorrow = result['weather'][1]
-dayafter = result['weather'][2]
+
+today = result["weather"][0]
+tomorrow = result["weather"][1]
+dayafter = result["weather"][2]
 
 headers = [
     "",
     f"<b>Today\n{today['date'][5:]}</b>",
     f"<b>Tomorrow\n{tomorrow['date'][5:]}</b>",
-    f"<b>&nbsp;\n{dayafter['date'][5:]}</b>"
+    f"<b>&nbsp;\n{dayafter['date'][5:]}</b>",
 ]
 
 data = [
     headers,
-    ["9 AM", render_cell(today["hourly"][3]), render_cell(tomorrow["hourly"][3]), render_cell(dayafter["hourly"][3])],
-    ["Noon", render_cell(today["hourly"][4]), render_cell(tomorrow["hourly"][4]), render_cell(dayafter["hourly"][4])],
-    ["9 PM", render_cell(today["hourly"][7]), render_cell(tomorrow["hourly"][7]), render_cell(dayafter["hourly"][7])],
+    [
+        "9 AM",
+        render_cell(today["hourly"][3]),
+        render_cell(tomorrow["hourly"][3]),
+        render_cell(dayafter["hourly"][3]),
+    ],
+    [
+        "Noon",
+        render_cell(today["hourly"][4]),
+        render_cell(tomorrow["hourly"][4]),
+        render_cell(dayafter["hourly"][4]),
+    ],
+    [
+        "9 PM",
+        render_cell(today["hourly"][7]),
+        render_cell(tomorrow["hourly"][7]),
+        render_cell(dayafter["hourly"][7]),
+    ],
 ]
 
-generated=datetime
-    .datetime
-    .now()
+generated = (
+    datetime.datetime.now()
     .astimezone(pytz.timezone("America/Denver"))
     .replace(microsecond=0)
     .isoformat()
+)
 
-print(HTML_TEMPLATE.format(current=tabulate(current, tablefmt="unsafehtml"),
-                           sunrise=f"sunrise: {result['weather'][0]['astronomy'][0]['sunrise']}",
-                           sunset=f"sunset : {result['weather'][0]['astronomy'][0]['sunset']}",
-                           data=tabulate(data, tablefmt="unsafehtml"),
-                           time=generated))
+print(
+    HTML_TEMPLATE.format(
+        current=tabulate(current, tablefmt="unsafehtml"),
+        sunrise=f"sunrise: {result['weather'][0]['astronomy'][0]['sunrise']}",
+        sunset=f"sunset : {result['weather'][0]['astronomy'][0]['sunset']}",
+        data=tabulate(data, tablefmt="unsafehtml"),
+        time=generated,
+    )
+)
