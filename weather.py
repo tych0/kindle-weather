@@ -45,12 +45,6 @@ HTML_TEMPLATE = """
             {current}
         </div>
         <div>
-            {sunrise}
-        </div>
-        <div>
-            {sunset}
-        </div>
-        <div>
             {data}
         </div>
         <div style="padding-top: 3em">
@@ -59,7 +53,12 @@ HTML_TEMPLATE = """
     </body>
 </html>
 """
-req = Request("https://wttr.in/Denver?format=j1")
+
+# https://www.weather.gov/documentation/services-web-api
+# points found by https://api.weather.gov/gridpoints/39.7490,-105.0484 (middle of sloan's lake)
+
+req = Request("https://api.weather.gov/gridpoints/BOU/60,61/forecast/hourly")
+req.add_header("User-Agent", "(https://github.com/tych0/kindle-weather, tycho@tycho.pizza)")
 res = urlopen(req)
 charset = res.headers.get_content_charset()
 
@@ -71,57 +70,65 @@ result = json.loads(body)
 
 current = [
     [
-        result["current_condition"][0]["weatherDesc"][0]["value"],
-        f"""<span style="font-size: 40px">{result['current_condition'][0]['temp_F']} F</span>""",
+        result["properties"]["periods"][0]["shortForecast"],
+        f"""<span style="font-size: 40px">{result['properties']['periods'][0]['temperature']} F</span>""",
     ]
 ]
 
 
-def render_cell(hourly):
-    desc = hourly["weatherDesc"][0]["value"]
-    temp = f"""<span style="font-size: 28px">{hourly['tempF']} F</span>"""
+def render_cell(periods, offset):
+    if offset < 0:
+        return "N/A"
+    hourly = periods[offset]
+    desc = hourly["shortForecast"]
+    temp = f"""<span style="font-size: 28px">{hourly['temperature']} F</span>"""
     windy = ""
-    if int(hourly["windspeedMiles"]) > 10:
+    if hourly["windSpeed"] > "10 mph":
         windy = "windy!"
     return f"{desc}\n{temp}\n{windy}"
 
 
-today = result["weather"][0]
-tomorrow = result["weather"][1]
-dayafter = result["weather"][2]
+MT = pytz.timezone("America/Denver")
+
+today = datetime.datetime.now().astimezone(MT).date()
+tomorrow = today + datetime.timedelta(days=1)
+dayafter = tomorrow + datetime.timedelta(days=1)
 
 headers = [
     "",
-    f"<b>Today\n{today['date'][5:]}</b>",
-    f"<b>Tomorrow\n{tomorrow['date'][5:]}</b>",
-    f"<b>&nbsp;\n{dayafter['date'][5:]}</b>",
+    f"<b>Today\n{today.isoformat()}</b>",
+    f"<b>Tomorrow\n{tomorrow.isoformat()}</b>",
+    f"<b>&nbsp;\n{dayafter.isoformat()}</b>",
 ]
+
+offset = datetime.datetime.now().astimezone(MT).hour
+periods = result["properties"]["periods"]
 
 data = [
     headers,
     [
         "9 AM",
-        render_cell(today["hourly"][3]),
-        render_cell(tomorrow["hourly"][3]),
-        render_cell(dayafter["hourly"][3]),
+        render_cell(periods, 9 - offset),
+        render_cell(periods, 24 + 9 - offset),
+        render_cell(periods, 24 + 24 + 9 - offset),
     ],
     [
         "Noon",
-        render_cell(today["hourly"][4]),
-        render_cell(tomorrow["hourly"][4]),
-        render_cell(dayafter["hourly"][4]),
+        render_cell(periods, 12 - offset),
+        render_cell(periods, 24 + 12 - offset),
+        render_cell(periods, 24 + 24 + 12 - offset),
     ],
     [
         "9 PM",
-        render_cell(today["hourly"][7]),
-        render_cell(tomorrow["hourly"][7]),
-        render_cell(dayafter["hourly"][7]),
+        render_cell(periods, 21 - offset),
+        render_cell(periods, 24 + 21 - offset),
+        render_cell(periods, 24 + 24 + 21 - offset),
     ],
 ]
 
 generated = (
     datetime.datetime.now()
-    .astimezone(pytz.timezone("America/Denver"))
+    .astimezone(MT)
     .replace(microsecond=0)
     .isoformat()
 )
@@ -129,8 +136,6 @@ generated = (
 print(
     HTML_TEMPLATE.format(
         current=tabulate(current, tablefmt="unsafehtml"),
-        sunrise=f"sunrise: {result['weather'][0]['astronomy'][0]['sunrise']}",
-        sunset=f"sunset : {result['weather'][0]['astronomy'][0]['sunset']}",
         data=tabulate(data, tablefmt="unsafehtml"),
         time=generated,
     )
