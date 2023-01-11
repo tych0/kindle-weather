@@ -101,7 +101,7 @@ headers = [
     f"<b>&nbsp;\n{dayafter.isoformat()}</b>",
 ]
 
-offset = datetime.datetime.now().astimezone(MT).hour
+offset = datetime.datetime.now().astimezone(MT).hour + 1
 periods = result["properties"]["periods"]
 
 data = [
