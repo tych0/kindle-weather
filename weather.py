@@ -81,7 +81,7 @@ def render_cell(periods, offset):
     desc = hourly["shortForecast"]
     temp = f"""<span style="font-size: 28px">{hourly['temperature']} F</span>"""
     windy = ""
-    if hourly["windSpeed"] > "10 mph":
+    if int(hourly["windSpeed"].split(" ")[0]) > 10:
         windy = "windy!"
     return f"<div>{desc}</div><div>{temp}</div><div>{windy}</div>"
 
