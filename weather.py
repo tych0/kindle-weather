@@ -25,15 +25,13 @@ HTML_TEMPLATE = """
             }}
             div {{
                 display: block;
-                width: 600px;
             }}
             table {{
-                table-layout: fixed;
-                width: 600px;
+                width: 580px;
             }}
             td, th {{
                 padding-top: 1em;
-                white-space: pre;
+                padding-right: 1em;
                 vertical-align: top;
                 font-weight: normal;
             }}
@@ -85,7 +83,7 @@ def render_cell(periods, offset):
     windy = ""
     if hourly["windSpeed"] > "10 mph":
         windy = "windy!"
-    return f"{desc}\n{temp}\n{windy}"
+    return f"<div>{desc}</div><div>{temp}</div><div>{windy}</div>"
 
 
 MT = pytz.timezone("America/Denver")
@@ -96,9 +94,9 @@ dayafter = tomorrow + datetime.timedelta(days=1)
 
 headers = [
     "",
-    f"<b>Today\n{today.strftime('%m-%d')}</b>",
-    f"<b>Tomorrow\n{tomorrow.strftime('%m-%d')}</b>",
-    f"<b>&nbsp;\n{dayafter.strftime('%m-%d')}</b>",
+    f"<b><div>Today</div><div>{today.strftime('%m-%d')}</div></b>",
+    f"<b><div>Tomorrow</div><div>{tomorrow.strftime('%m-%d')}</div></b>",
+    f"<b><div>&nbsp;</div><div>{dayafter.strftime('%m-%d')}</div></b>",
 ]
 
 offset = datetime.datetime.now().astimezone(MT).hour + 1
