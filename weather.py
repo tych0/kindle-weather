@@ -117,6 +117,12 @@ data = [
         render_cell(periods, 24 + 24 + 12 - offset),
     ],
     [
+        "2 PM",
+        render_cell(periods, 14 - offset),
+        render_cell(periods, 24 + 14 - offset),
+        render_cell(periods, 24 + 24 + 14 - offset),
+    ],
+    [
         "9 PM",
         render_cell(periods, 21 - offset),
         render_cell(periods, 24 + 21 - offset),
