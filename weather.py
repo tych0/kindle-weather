@@ -96,9 +96,9 @@ dayafter = tomorrow + datetime.timedelta(days=1)
 
 headers = [
     "",
-    f"<b>Today\n{today.isoformat()}</b>",
-    f"<b>Tomorrow\n{tomorrow.isoformat()}</b>",
-    f"<b>&nbsp;\n{dayafter.isoformat()}</b>",
+    f"<b>Today\n{today.strftime('%m-%d')}</b>",
+    f"<b>Tomorrow\n{tomorrow.strftime('%m-%d')}</b>",
+    f"<b>&nbsp;\n{dayafter.strftime('%m-%d')}</b>",
 ]
 
 offset = datetime.datetime.now().astimezone(MT).hour + 1
