@@ -56,7 +56,9 @@ HTML_TEMPLATE = """
 # points found by https://api.weather.gov/gridpoints/39.7490,-105.0484 (middle of sloan's lake)
 
 req = Request("https://api.weather.gov/gridpoints/BOU/60,61/forecast/hourly")
-req.add_header("User-Agent", "(https://github.com/tych0/kindle-weather, tycho@tycho.pizza)")
+req.add_header(
+    "User-Agent", "(https://github.com/tych0/kindle-weather, tycho@tycho.pizza)"
+)
 res = urlopen(req)
 charset = res.headers.get_content_charset()
 
@@ -72,18 +74,6 @@ current = [
         f"""<span style="font-size: 40px">{result['properties']['periods'][0]['temperature']} F</span>""",
     ]
 ]
-
-
-def render_cell(periods, offset):
-    if offset < 0:
-        return "N/A"
-    hourly = periods[offset]
-    desc = hourly["shortForecast"]
-    temp = f"""<span style="font-size: 28px">{hourly['temperature']} F</span>"""
-    windy = ""
-    if int(hourly["windSpeed"].split(" ")[0]) > 10:
-        windy = "windy!"
-    return f"<div>{desc}</div><div>{temp}</div><div>{windy}</div>"
 
 
 MT = pytz.timezone("America/Denver")
@@ -102,39 +92,38 @@ headers = [
 offset = datetime.datetime.now().astimezone(MT).hour + 1
 periods = result["properties"]["periods"]
 
+
+def render_cell(offset):
+    if offset < 0:
+        return "N/A"
+    hourly = periods[offset]
+    desc = hourly["shortForecast"]
+    temp = f"""<span style="font-size: 28px">{hourly['temperature']} F</span>"""
+    windy = ""
+    if int(hourly["windSpeed"].split(" ")[0]) > 10:
+        windy = "windy!"
+    return f"<div>{desc}</div><div>{temp}</div><div>{windy}</div>"
+
+
+times = [
+    ("9 AM", 9),
+    ("Noon", 12),
+    ("2 PM", 14),
+    ("9 PM", 21),
+]
+
 data = [
-    headers,
     [
-        "9 AM",
-        render_cell(periods, 9 - offset),
-        render_cell(periods, 24 + 9 - offset),
-        render_cell(periods, 24 + 24 + 9 - offset),
-    ],
-    [
-        "Noon",
-        render_cell(periods, 12 - offset),
-        render_cell(periods, 24 + 12 - offset),
-        render_cell(periods, 24 + 24 + 12 - offset),
-    ],
-    [
-        "2 PM",
-        render_cell(periods, 14 - offset),
-        render_cell(periods, 24 + 14 - offset),
-        render_cell(periods, 24 + 24 + 14 - offset),
-    ],
-    [
-        "9 PM",
-        render_cell(periods, 21 - offset),
-        render_cell(periods, 24 + 21 - offset),
-        render_cell(periods, 24 + 24 + 21 - offset),
-    ],
+        header,
+        render_cell(t - offset),
+        render_cell(24 + t - offset),
+        render_cell(24 + 24 + t - offset),
+    ]
+    for (header, t) in times
 ]
 
 generated = (
-    datetime.datetime.now()
-    .astimezone(MT)
-    .replace(microsecond=0)
-    .isoformat()
+    datetime.datetime.now().astimezone(MT).replace(microsecond=0).isoformat()
 )
 
 print(
