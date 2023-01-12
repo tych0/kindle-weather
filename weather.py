@@ -43,6 +43,12 @@ HTML_TEMPLATE = """
             {current}
         </div>
         <div>
+            {sunrise}
+        </div>
+        <div>
+            {sunset}
+        </div>
+        <div>
             {data}
         </div>
         <div style="padding-top: 3em">
@@ -52,21 +58,28 @@ HTML_TEMPLATE = """
 </html>
 """
 
+def make_req(url):
+    req = Request(url)
+
+    req.add_header(
+        "User-Agent", "(https://github.com/tych0/kindle-weather, tycho@tycho.pizza)"
+    )
+    res = urlopen(req)
+    charset = res.headers.get_content_charset()
+
+    body = res.read()
+    if charset:
+        body = body.decode(charset)
+    result = json.loads(body)
+    return result
+
 # https://www.weather.gov/documentation/services-web-api
 # points found by https://api.weather.gov/gridpoints/39.7490,-105.0484 (middle of sloan's lake)
+result = make_req("https://api.weather.gov/gridpoints/BOU/60,61/forecast/hourly")
 
-req = Request("https://api.weather.gov/gridpoints/BOU/60,61/forecast/hourly")
-req.add_header(
-    "User-Agent", "(https://github.com/tych0/kindle-weather, tycho@tycho.pizza)"
-)
-res = urlopen(req)
-charset = res.headers.get_content_charset()
-
-body = res.read()
-if charset:
-    body = body.decode(charset)
-
-result = json.loads(body)
+wttr_result = make_req("https://wttr.in/Denver?format=j1")
+sunrise=f"sunrise: {wttr_result['weather'][0]['astronomy'][0]['sunrise']}"
+sunset=f"sunrise: {wttr_result['weather'][0]['astronomy'][0]['sunset']}"
 
 current = [
     [
@@ -130,6 +143,8 @@ print(
     HTML_TEMPLATE.format(
         current=tabulate(current, tablefmt="unsafehtml"),
         data=tabulate(data, tablefmt="unsafehtml"),
+        sunrise=sunrise,
+        sunset=sunset,
         time=generated,
     )
 )
