@@ -79,7 +79,7 @@ hourly_forecast = make_req("https://api.weather.gov/gridpoints/BOU/60,61/forecas
 
 wttr_result = make_req("https://wttr.in/Denver?format=j1")
 sunrise=f"sunrise: {wttr_result['weather'][0]['astronomy'][0]['sunrise']}"
-sunset=f"sunrise: {wttr_result['weather'][0]['astronomy'][0]['sunset']}"
+sunset=f"sunset: {wttr_result['weather'][0]['astronomy'][0]['sunset']}"
 
 current = [
     [
