@@ -38,20 +38,20 @@ HTML_TEMPLATE = """
         </style>
     </head>
     <body>
-        <div style="white-space: pre; padding-top: 3em">Current:</div>
+        <div style="padding-top: 3em">Current:</div>
         <div>
             {current}
         </div>
         <div>
-            {sunrise}
-        </div>
-        <div>
-            {sunset}
+            {sunrise} {sunset}
         </div>
         <div>
             {data}
         </div>
-        <div style="padding-top: 3em">
+        <div style="width: 580px">
+            {detailed}
+        </div>
+        <div style="padding-top: 1em">
             Generated: {time}
         </div>
     </body>
@@ -139,12 +139,15 @@ generated = (
     datetime.datetime.now().astimezone(MT).replace(microsecond=0).isoformat()
 )
 
+detailed = make_req('https://api.weather.gov/gridpoints/BOU/60,61/forecast')
+
 print(
     HTML_TEMPLATE.format(
         current=tabulate(current, tablefmt="unsafehtml"),
         data=tabulate(data, tablefmt="unsafehtml"),
         sunrise=sunrise,
         sunset=sunset,
+        detailed=detailed["properties"]["periods"][0]["detailedForecast"],
         time=generated,
     )
 )
