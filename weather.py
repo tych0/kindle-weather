@@ -75,7 +75,7 @@ def make_req(url):
 
 # https://www.weather.gov/documentation/services-web-api
 # points found by https://api.weather.gov/gridpoints/39.7490,-105.0484 (middle of sloan's lake)
-result = make_req("https://api.weather.gov/gridpoints/BOU/60,61/forecast/hourly")
+hourly_forecast = make_req("https://api.weather.gov/gridpoints/BOU/60,61/forecast/hourly")
 
 wttr_result = make_req("https://wttr.in/Denver?format=j1")
 sunrise=f"sunrise: {wttr_result['weather'][0]['astronomy'][0]['sunrise']}"
@@ -83,8 +83,8 @@ sunset=f"sunrise: {wttr_result['weather'][0]['astronomy'][0]['sunset']}"
 
 current = [
     [
-        result["properties"]["periods"][0]["shortForecast"],
-        f"""<span style="font-size: 40px">{result['properties']['periods'][0]['temperature']} F</span>""",
+        hourly_forecast["properties"]["periods"][0]["shortForecast"],
+        f"""<span style="font-size: 40px">{hourly_forecast['properties']['periods'][0]['temperature']} F</span>""",
     ]
 ]
 
@@ -103,7 +103,7 @@ headers = [
 ]
 
 offset = datetime.datetime.now().astimezone(MT).hour + 1
-periods = result["properties"]["periods"]
+periods = hourly_forecast["properties"]["periods"]
 
 
 def render_cell(offset):
