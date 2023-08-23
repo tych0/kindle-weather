@@ -38,7 +38,6 @@ HTML_TEMPLATE = """
         </style>
     </head>
     <body>
-        <div style="padding-top: 3em">Current:</div>
         <div>
             {current}
         </div>
