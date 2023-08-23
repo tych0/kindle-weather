@@ -1,9 +1,10 @@
 ## kindle-weather
 
 This is a repo I use to render a PNG for use with
-[kindle-dash](https://github.com/pascalw/kindle-dash) and
-[wttr](https://wttr.in). It is [not very pretty](sample.png),
-but it works :)
+[kindle-dash](https://github.com/pascalw/kindle-dash), the [National Oceanic
+and Atmospheric Administration's
+API](https://www.weather.gov/documentation/services-web-api) and
+[wttr](https://wttr.in). It is [not very pretty](sample.png), but it works :)
 
 ## LICENSE
 
