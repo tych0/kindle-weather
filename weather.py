@@ -35,10 +35,13 @@ HTML_TEMPLATE = """
                 vertical-align: top;
                 font-weight: normal;
             }}
+            .current-weather {{
+                font-size: 40px;
+            }}
         </style>
     </head>
     <body>
-        <div>
+        <div class="current-weather">
             {current}
         </div>
         <div>
@@ -83,7 +86,7 @@ sunset=f"sunset: {wttr_result['weather'][0]['astronomy'][0]['sunset']}"
 current = [
     [
         hourly_forecast["properties"]["periods"][0]["shortForecast"],
-        f"""<span style="font-size: 40px">{hourly_forecast['properties']['periods'][0]['temperature']} F</span>""",
+        hourly_forecast['properties']['periods'][0]['temperature'],
     ]
 ]
 
